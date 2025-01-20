@@ -56,5 +56,5 @@ Contact
 For inquiries or support, please reach out to:
 
 Name: Tomola Oke
-Email: your_email@example.com
+Email: tommola.oke@gmail.com
 GitHub: github.com/tomolaoke
