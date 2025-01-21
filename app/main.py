@@ -7,7 +7,7 @@ from .manager.usermanager import get_user_manager
 from .routers import app_routes
 from .schemas.users import UserCreate, UserRead, UserUpdate
 from .models.database import User
-from .utils.db_manager import get_db, create_db_and_tables
+from .utils.database import init_db
 
 app = FastAPI(title="Network Outage Forecaster")
 weather_service = WeatherService()
@@ -29,14 +29,14 @@ app.include_router(
     prefix="/auth",
     tags=["auth"],
 )
+app.include_router(app_routes)
 app.include_router(
     fastapi_users.get_users_router(UserRead, UserUpdate),
-    prefix="/users",
+    prefix="/auth_users",
     tags=["users"],
 )
-app.include_router(app_routes)
 
 
 @app.on_event("startup")
 async def startup_event():
-    await create_db_and_tables()
+    init_db()
