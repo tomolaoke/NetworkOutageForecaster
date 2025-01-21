@@ -1,14 +1,14 @@
 from fastapi import HTTPException, Depends, APIRouter
 from sqlalchemy.orm import Session
-from .models.database import WeatherRecord, School, NetworkOutage
+from .models.database import WeatherRecord, School, NetworkOutage, User
 from .schemas.schools import SchoolCreate
-from .utils.db_manager import get_db
+from .utils.database import get_db
 
 
 app_routes = APIRouter()
 
 
-@app_routes.post("/schools/")
+@app_routes.post("/schools/", tags=["schools"])
 async def create_school(school: SchoolCreate, db: Session = Depends(get_db)):
     db_school = School(**school.dict())
     db.add(db_school)
@@ -17,7 +17,7 @@ async def create_school(school: SchoolCreate, db: Session = Depends(get_db)):
     return db_school
 
 
-@app_routes.get("/schools/")
+@app_routes.get("/schools/", tags=["schools"])
 async def list_schools(db: Session = Depends(get_db)):
     schools = db.query(School).all()
     return schools
@@ -54,7 +54,7 @@ async def report_outage(school_id: int, db: Session = Depends(get_db)):
     return outage
 
 
-@app_routes.get("/predict/{school_id}")
+@app_routes.get("/predict/{school_id}", tags=["predictions"])
 async def predict_outage(school_id: int, db: Session = Depends(get_db)):
     """Predict outage risk for a specific school"""
     # Get school
@@ -88,7 +88,7 @@ async def predict_outage(school_id: int, db: Session = Depends(get_db)):
     }
 
 
-@app_routes.get("/predictions/retrain")
+@app_routes.get("/predictions/retrain", tags=["predictions"])
 async def retrain_model(db: Session = Depends(get_db)):
     """Force model retraining"""
     success = prediction_service.train_model(db)
@@ -98,7 +98,7 @@ async def retrain_model(db: Session = Depends(get_db)):
     }
 
 
-@app_routes.get("/predict/{school_id}/with-alerts")
+@app_routes.get("/predict/{school_id}/with-alerts", tags=["predictions"])
 async def predict_and_alert(school_id: int, db: Session = Depends(get_db)):
     """Predict outage risk and send alerts if necessary"""
     # Get school
@@ -166,3 +166,14 @@ async def test_alerts(school_id: int, db: Session = Depends(get_db)):
         "message": "Test alerts triggered",
         "results": alert_results
     }
+
+
+@app_routes.get("/users/", tags=["users"],)
+async def users(db: Session = Depends(get_db)):
+    return db.query(User).all()
+
+
+@app_routes.get("/users/{id}", tags=["users"])
+async def user(id: int, db: Session = Depends(get_db)):
+    return db.query(User).filter(User.id == id).first()
+
