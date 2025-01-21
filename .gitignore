@@ -1,6 +1,12 @@
 echo "__pycache__/
+__pycache__/
 *.pyc
 *.pyo
 *.env
 venv/
 .env" > .gitignore
+*.vscode
+.vscode
+.venv
+.env
+*.env
